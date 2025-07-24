@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Hugging Face cache
+hf_cache/
+
 # Virtual environment
 venv/
 .env/

@@ -14,6 +14,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return {"message": "NutriQuery Backend Running"}
+
 @app.post("/ask")
 async def ask_question(
     query: str = Form(...),
