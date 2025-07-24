@@ -34,7 +34,7 @@ if index_name not in pc.list_indexes():
 """
 def load_embeddings():
     return HuggingFaceEndpointEmbeddings(
-        endpoint_url="https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",  # e.g., hosted inference API URL
+        model="sentence-transformers/all-MiniLM-L6-v2",
         huggingfacehub_api_token=os.getenv("HF_TOKEN"),
     )
 
