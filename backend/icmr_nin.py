@@ -37,7 +37,6 @@ if index_name not in pc.list_indexes():
 def load_embeddings():
     return HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2",
-        token=os.environ["HF_TOKEN"]
     )
 
 index = pc.Index(index_name)
