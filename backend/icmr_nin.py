@@ -34,8 +34,7 @@ if index_name not in pc.list_indexes():
 """
 def load_embeddings():
     return HuggingFaceEndpointEmbeddings(
-        api_key = os.getenv("HF_TOKEN"),
-        model_name="all-MiniLM-L6-v2",
+        model_name="all-MiniLM-L6-v2"
     )
 
 index = pc.Index(index_name)
