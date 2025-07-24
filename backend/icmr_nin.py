@@ -1,5 +1,5 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 import pdfplumber
 import subprocess
 from langchain_community.retrievers import PineconeHybridSearchRetriever
@@ -33,7 +33,7 @@ if index_name not in pc.list_indexes():
     
 """
 def load_embeddings():
-    return HuggingFaceInferenceAPIEmbeddings(
+    return HuggingFaceEndpointEmbeddings(
         api_key = os.getenv("HF_TOKEN"),
         model_name="all-MiniLM-L6-v2",
     )
