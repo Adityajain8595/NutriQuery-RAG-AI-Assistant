@@ -34,19 +34,15 @@ if index_name not in pc.list_indexes():
     )
     
 """
-
-# Preload model to local directory (cached)
-snapshot_download(repo_id="sentence-transformers/all-MiniLM-L6-v2", local_dir="./hf_cache", token=os.environ["HF_TOKEN"])
-
 def load_embeddings():
     return HuggingFaceEmbeddings(
-        model_name="./hf_cache",  # Local path instead of huggingface repo
-        cache_folder="./hf_cache"
+        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        token=os.environ["HF_TOKEN"]
     )
 
 index = pc.Index(index_name)
 
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+embeddings = load_embeddings()
 
 BM25_Encoder = BM25Encoder().default()
 
