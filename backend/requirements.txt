@@ -17,3 +17,4 @@ pdfplumber
 ocrmypdf
 more_itertools
 hf_xet
+sentence_transformers
