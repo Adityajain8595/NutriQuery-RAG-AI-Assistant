@@ -6,6 +6,7 @@ langchain_huggingface
 langchain_groq
 langchain_text_splitters
 pathlib
+sentence_transformers
 fastapi
 uvicorn
 pinecone-client
