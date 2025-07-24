@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NutriQuery - AI Nutrition Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <style>
+    
+  </style>
+</head>
+<body>
+  <div class="sidebar" id="chatSidebar">
+    <button class="toggle-btn" onclick="toggleSidebar()">❌ Hide</button>
+    <div id="chatHistory" class="chat-history">
+      <h3>🧾 Chat History</h3>
+      <ul id="chatList"></ul>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <img src="{{ url_for('static', filename='/assets/nutriquery_logo.png') }}" alt="NutriQuery Logo" style="border-radius: 10px; width: 80px; height: auto;" />
+      <button class="toggle-btn" onclick="toggleSidebar()"><h4>📜 Show Chat</h4></button>
+    </div>
+    <div class="welcome-banner" style="background-color: #e0f7fa; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+      <h2>Welcome to NutriQuery!</h2>
+      <p>Hello! I'm <strong>NutriQuery</strong>, your guide to healthy eating and well-being.</p>
+    </div>
+    <p class="subtitle">Ask your questions related to nutrition and health below.</p>
+
+    <div class="chatbox">
+      <input type="text" id="userInput" placeholder="Ask NutriQuery..." />
+      <button id="mic-btn" title="Speak your question 🎤">🎙️</button>
+      <button onclick="sendQuery()">Ask</button>
+    </div>
+
+    <div id="answerBox" class="answer-box"></div>
+
+    <!-- Upload PDF Section -->
+    <div class="upload-box">
+      <h3>📄 You can also upload your PDF file to ask queries!</h3>
+      <input type="file" id="pdfUpload" accept=".pdf"/>
+      <button onclick="uploadPDF()">Upload PDF</button>
+      
+      <!-- Spinner -->
+      <div id="uploadSpinner" style="display:none; margin-top:10px;">
+        <span class="spinner"></span> Uploading...
+      </div>
+
+      <!-- Upload Status -->
+      <div id="uploadStatus" style="margin-top: 10px;"></div>
+    </div>
+
+    <div class="feature-card-container">
+      <div class="feature-card">
+        <img src="{{ url_for('static', filename='/assets/instant_icon.png') }}" alt="AI Icon" style="width: 100px; height: auto;" />
+        <h3>AI-Powered Responses</h3>
+        <p>Get instant and evidence-based nutritional advice powered by AI and ICMR-NIN guidelines.</p>
+      </div>
+      <div class="feature-card">
+        <img src="{{ url_for('static', filename='/assets/voice_icon.png') }}" alt="Voice Icon" style="width: 100px; height: auto;" />
+        <h3>Voice Support Enabled</h3>
+        <p>Too busy to type? Just tap the mic and ask your question aloud - fast and accessible!</p>
+      </div>
+      <div class="feature-card">
+        <img src="{{ url_for('static', filename='/assets/document_icon.png') }}" alt="Document Icon" style="width: 100px; height: auto;" />
+        <h3>Document Analysis</h3>
+        <p>Upload your documents related to nutrition and get real-time analysis.</p>
+      </div>
+    </div>
+
+    <div class="disclaimer-card">
+      <div class="disclaimer-text">
+        <strong>⚠️ Disclaimer:</strong><br />
+        This tool provides nutrition-related insights derived from official documents. It is not a substitute for professional medical advice. Please consult a healthcare expert for personalized guidance.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Marked.js for Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script>
+    const session_id = "default_session";
+
+    const micBtn = document.getElementById("mic-btn");
+    const userInput = document.getElementById("userInput");
+
+    // Initialize Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-IN';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    micBtn.addEventListener("click", () => {
+      recognition.start();
+      micBtn.disabled = true;
+      micBtn.innerText = "🎙️ Listening...";
+    });
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      document.getElementById("userInput").value = transcript;
+      micBtn.disabled = false;
+      micBtn.innerText = "🎤";
+
+      sendQuery();  // Automatically trigger the query after speech
+    };
+
+
+    recognition.onend = () => {
+      micBtn.disabled = false;
+      micBtn.innerText = "🎤";
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech recognition error:", event.error);
+      micBtn.disabled = false;
+      micBtn.innerText = "🎤";
+    };
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("chatSidebar");
+      sidebar.style.display = sidebar.style.display === "flex" ? "none" : "flex";
+    }
+
+    async function sendQuery() {
+      const query = document.getElementById("userInput").value;
+      if (!query.trim()) return;
+
+      const formData = new FormData();
+      formData.append("query", query);
+      formData.append("session_id", session_id);
+
+      const res = await fetch("http://127.0.0.1:8000/ask", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      // Render Markdown answer
+      document.getElementById("answerBox").innerHTML = marked.parse(data.answer);
+
+      const historyList = document.getElementById("chatList");
+
+      const now = new Date();
+      const timestamp = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const card = document.createElement("div");
+      card.className = "chat-card";
+
+      // Render chat history
+      card.innerHTML = `
+        <div class="chat-header" onclick="this.nextElementSibling.classList.toggle('visible')">
+          <div class="chat-question"><strong>You:</strong> ${marked.parse(data.chat_history[data.chat_history.length - 2])}</div>
+          <div class="chat-timestamp">${timestamp}</div>
+        </div>
+        <div class="chat-answer">
+          <strong>NutriQuery:</strong><br>${marked.parse(data.chat_history[data.chat_history.length - 1])}
+        </div>
+      `;
+
+      historyList.insertBefore(card, historyList.firstChild);
+      document.getElementById("userInput").value = "";
+    }
+
+    async function uploadPDF() {
+      const file = document.getElementById("pdfUpload").files[0];
+      const spinner = document.getElementById("uploadSpinner");
+      const statusBox = document.getElementById("uploadStatus");
+
+      if (!file) {
+        statusBox.innerHTML = "<span style='color: red;'>❌ Please select a PDF file.</span>";
+        return;
+      }
+
+      spinner.style.display = "block";
+      statusBox.innerHTML = "";
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("http://127.0.0.1:8000/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          statusBox.innerHTML = `<span style='color: green;'>✅ ${data.message}</span>`;
+        } else {
+          statusBox.innerHTML = `<span style='color: red;'>❌ ${data.error}</span>`;
+        }
+      } catch (err) {
+        statusBox.innerHTML = "<span style='color: red;'>❌ Upload failed. Please try again.</span>";
+      } finally {
+        spinner.style.display = "none";
+      }
+    }
+
+  </script>
+</body>
+</html>
