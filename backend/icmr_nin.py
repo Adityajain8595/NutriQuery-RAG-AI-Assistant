@@ -1,7 +1,5 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from pypdf import PdfReader
 from langchain_huggingface import HuggingFaceEmbeddings
-from huggingface_hub import snapshot_download
 import pdfplumber
 import subprocess
 from langchain_community.retrievers import PineconeHybridSearchRetriever
@@ -36,7 +34,7 @@ if index_name not in pc.list_indexes():
 """
 def load_embeddings():
     return HuggingFaceEmbeddings(
-        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_name="all-MiniLM-L6-v2",
     )
 
 index = pc.Index(index_name)

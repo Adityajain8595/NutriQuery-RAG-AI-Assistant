@@ -5,7 +5,6 @@ langchain_core
 langchain_huggingface
 langchain_groq
 langchain_text_splitters
-pypdf
 pathlib
 flask
 fastapi
@@ -16,5 +15,3 @@ pinecone-text
 pdfplumber
 ocrmypdf
 more_itertools
-hf_xet
-sentence_transformers

@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-from pypdf import PdfReader
 from pathlib import Path
 import pdfplumber
 import subprocess
