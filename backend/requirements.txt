@@ -6,7 +6,6 @@ langchain_huggingface
 langchain_groq
 langchain_text_splitters
 pathlib
-flask
 fastapi
 uvicorn
 pinecone-client
