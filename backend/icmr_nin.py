@@ -1,9 +1,9 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEndpointEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 import pdfplumber
 import subprocess
 from langchain_community.retrievers import PineconeHybridSearchRetriever
-from pinecone import Pinecone, ServerlessSpec
+from pinecone import Pinecone
 from pinecone_text.sparse import BM25Encoder
 from tqdm import tqdm
 from more_itertools import chunked 
@@ -33,24 +33,20 @@ if index_name not in pc.list_indexes():
     
 """
 def load_embeddings():
-    return HuggingFaceEndpointEmbeddings(
-        model="sentence-transformers/all-MiniLM-L6-v2",
-        huggingfacehub_api_token=os.getenv("HF_TOKEN"),
+    return HuggingFaceEmbeddings(
+        model="sentence-transformers/all-MiniLM-L6-v2"
     )
 
 index = pc.Index(index_name)
 
-embeddings = load_embeddings()
-
-BM25_Encoder = BM25Encoder().default()
-
-retriever = PineconeHybridSearchRetriever(embeddings=embeddings, sparse_encoder=BM25_Encoder, index=index)
-
-splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-
 if index.describe_index_stats().total_vector_count > 0:
     print("✅ ICMR-NIN embeddings already exist. Skipping embedding.")
 else:
+    embeddings = load_embeddings()
+    BM25_Encoder = BM25Encoder().default()
+    retriever = PineconeHybridSearchRetriever(embeddings=embeddings, sparse_encoder=BM25_Encoder, index=index)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+
     # 🧠 Embed logic for ICMR-NIN documents
     folder_path= r"C:\Users\ADMIN\OneDrive\Documents\Code\Langchain_Projects\NutriQuery-RAG-Chatbot\backend\icmr_nin"
     ocr_output_dir = os.path.join(folder_path, "ocr_temp")
