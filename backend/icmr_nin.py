@@ -1,50 +1,15 @@
+from globals import index, pc_retriever
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
 import pdfplumber
 import subprocess
-from langchain_community.retrievers import PineconeHybridSearchRetriever
-from pinecone import Pinecone
-from pinecone_text.sparse import BM25Encoder
 from tqdm import tqdm
 from more_itertools import chunked 
 from pathlib import Path
 import os
-from dotenv import load_dotenv
-load_dotenv()
-
-os.environ['LANGCHAIN_API_KEY'] = os.getenv("LANGCHAIN_API_KEY")
-os.environ['HF_TOKEN'] = os.getenv("HF_TOKEN")
-pinecone_api_key = os.getenv("PINECONE_API_KEY")
-
-index_name = "nutriquery-rag-hybrid-search"
-pc = Pinecone(api_key=pinecone_api_key)
-
-"""
-Use when the index is not created yet.
-
-if index_name not in pc.list_indexes():
-    print(f"🆕 Creating new index: {index_name}")
-    pc.create_index(
-        name=index_name,
-        metric="dotproduct",
-        dimension=384,
-        spec=ServerlessSpec(cloud='aws', region='us-east-1')
-    )
-    
-"""
-def load_embeddings():
-    return HuggingFaceEmbeddings(
-        model="sentence-transformers/all-MiniLM-L6-v2"
-    )
-
-index = pc.Index(index_name)
 
 if index.describe_index_stats().total_vector_count > 0:
     print("✅ ICMR-NIN embeddings already exist. Skipping embedding.")
 else:
-    embeddings = load_embeddings()
-    BM25_Encoder = BM25Encoder().default()
-    retriever = PineconeHybridSearchRetriever(embeddings=embeddings, sparse_encoder=BM25_Encoder, index=index)
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
     # 🧠 Embed logic for ICMR-NIN documents
@@ -106,6 +71,6 @@ else:
 
     # Now insert with progress bar
     for i, (text_batch, meta_batch) in enumerate(tqdm(zip(text_batches, metadata_batches), total=len(text_batches), desc="Embedding Batches")):
-        retriever.add_texts(text_batch, metadatas=meta_batch)
+        pc_retriever.add_texts(text_batch, metadatas=meta_batch)
 
     print("✅ Chunks embedded in the vectorstore!")
