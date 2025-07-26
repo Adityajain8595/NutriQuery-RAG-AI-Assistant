@@ -27,7 +27,7 @@ if index_name not in pc.list_indexes():
     
 """
 embeddings = HuggingFaceEndpointEmbeddings(
-    repo_id="https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
+    model_name="sentence-transformers/all-MiniLM-L6-v2",
     huggingfacehub_api_token=HF_TOKEN
 )
 index = pc.Index(index_name)
