@@ -9,6 +9,7 @@
   </style>
 </head>
 <body>
+  <!-- Sidebar -->
   <div class="sidebar" id="chatSidebar">
     <button class="toggle-btn" onclick="toggleSidebar()">❌ Hide</button>
     <div id="chatHistory" class="chat-history">
@@ -18,6 +19,7 @@
   </div>
 
   <div class="main">
+    <!-- Topbar --> 
     <div class="topbar">
       <img src="{{ url_for('static', filename='/assets/nutriquery_logo.png') }}" alt="NutriQuery Logo" style="border-radius: 10px; width: 80px; height: auto;" />
       <button class="toggle-btn" onclick="toggleSidebar()"><h4>📜 Show Chat</h4></button>
@@ -28,6 +30,7 @@
     </div>
     <p class="subtitle">Ask your questions related to nutrition and health below.</p>
 
+    <!-- Chatbox -->
     <div class="chatbox">
       <input type="text" id="userInput" placeholder="Ask NutriQuery..." />
       <button id="mic-btn" title="Speak your question 🎤">🎙️</button>
@@ -51,6 +54,7 @@
       <div id="uploadStatus" style="margin-top: 10px;"></div>
     </div>
 
+    <!-- Features Section -->
     <div class="feature-card-container">
       <div class="feature-card">
         <img src="{{ url_for('static', filename='/assets/instant_icon.png') }}" alt="AI Icon" style="width: 100px; height: auto;" />
@@ -69,6 +73,7 @@
       </div>
     </div>
 
+    <!-- Disclaimer -->
     <div class="disclaimer-card">
       <div class="disclaimer-text">
         <strong>⚠️ Disclaimer:</strong><br />
@@ -106,7 +111,7 @@
       micBtn.disabled = false;
       micBtn.innerText = "🎤";
 
-      sendQuery();  // Automatically trigger the query after speech
+      sendQuery();  
     };
 
 
@@ -141,7 +146,6 @@
 
       const data = await res.json();
 
-      // Render Markdown answer
       document.getElementById("answerBox").innerHTML = marked.parse(data.answer);
 
       const historyList = document.getElementById("chatList");
@@ -152,7 +156,6 @@
       const card = document.createElement("div");
       card.className = "chat-card";
 
-      // Render chat history
       card.innerHTML = `
         <div class="chat-header" onclick="this.nextElementSibling.classList.toggle('visible')">
           <div class="chat-question"><strong>You:</strong> ${marked.parse(data.chat_history[data.chat_history.length - 2])}</div>

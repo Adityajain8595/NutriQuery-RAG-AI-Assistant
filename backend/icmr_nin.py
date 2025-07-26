@@ -8,11 +8,11 @@ from pathlib import Path
 import os
 
 if index.describe_index_stats().total_vector_count > 0:
-    print("✅ ICMR-NIN embeddings already exist. Skipping embedding.")
+    print("ICMR-NIN embeddings already exist. Skipping embedding.")
 else:
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 
-    # 🧠 Embed logic for ICMR-NIN documents
+    # Embed logic for ICMR-NIN documents
     folder_path= r"C:\Users\ADMIN\OneDrive\Documents\Code\Langchain_Projects\NutriQuery-RAG-Chatbot\backend\icmr_nin"
     ocr_output_dir = os.path.join(folder_path, "ocr_temp")
     os.makedirs(ocr_output_dir, exist_ok=True)
@@ -41,7 +41,7 @@ else:
                         raw_text += text + "\n\n"
 
             if not raw_text.strip():
-                print(f"⚠️ Empty text after OCR: {pdf_file_path.name}")
+                print(f"Empty text after OCR: {pdf_file_path.name}")
                 continue
 
             # Chunking
@@ -51,12 +51,12 @@ else:
             )
             all_chunks.extend(chunks)
 
-            print(f"✅ Chunks created: {len(chunks)} for {pdf_file_path.name}")
+            print(f"Chunks created: {len(chunks)} for {pdf_file_path.name}")
 
         except subprocess.CalledProcessError as e:
-            print(f"❌ OCR failed for {pdf_file_path.name}: {e.stderr.decode()}")
+            print(f"OCR failed for {pdf_file_path.name}: {e.stderr.decode()}")
         except Exception as e:
-            print(f"❌ Error processing {pdf_file_path.name}: {e}")
+            print(f"Error processing {pdf_file_path.name}: {e}")
 
     # Extract texts and metadata separately
     texts = [doc.page_content for doc in all_chunks]
@@ -65,6 +65,7 @@ else:
     for meta in metadatas:
         meta["source_institute"] = "ICMR-National Institute of Nutrition, India"
 
+    # Batch insert texts and metadata
     batch_size = 100
     text_batches = list(chunked(texts, batch_size))
     metadata_batches = list(chunked(metadatas, batch_size))
@@ -73,4 +74,4 @@ else:
     for i, (text_batch, meta_batch) in enumerate(tqdm(zip(text_batches, metadata_batches), total=len(text_batches), desc="Embedding Batches")):
         pc_retriever.add_texts(text_batch, metadatas=meta_batch)
 
-    print("✅ Chunks embedded in the vectorstore!")
+    print("Chunks embedded in the vectorstore!")

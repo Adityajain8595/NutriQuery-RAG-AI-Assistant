@@ -1,4 +1,4 @@
-from langchain_huggingface import HuggingFaceEndpointEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.retrievers import PineconeHybridSearchRetriever
 from pinecone import Pinecone
 from pinecone_text.sparse import BM25Encoder
@@ -17,7 +17,7 @@ pc = Pinecone(api_key=pinecone_api_key)
 Use when the index is not created yet.
 
 if index_name not in pc.list_indexes():
-    print(f"🆕 Creating new index: {index_name}")
+    print(f" Creating new index: {index_name}")
     pc.create_index(
         name=index_name,
         metric="dotproduct",
@@ -26,10 +26,7 @@ if index_name not in pc.list_indexes():
     )
     
 """
-embeddings = HuggingFaceEndpointEmbeddings(
-    repo_id="sentence-transformers/all-MiniLM-L6-v2",
-    huggingfacehub_api_token=HF_TOKEN
-)
+embeddings = HuggingFaceEmbeddings(model="sentence-transformers/all-MiniLM-L6-v2")
 index = pc.Index(index_name)
-BM25_Encoder = BM25Encoder()
+BM25_Encoder = BM25Encoder().default()
 pc_retriever = PineconeHybridSearchRetriever(embeddings=embeddings, sparse_encoder=BM25_Encoder, index=index)

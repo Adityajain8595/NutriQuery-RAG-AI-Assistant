@@ -3,10 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Hugging Face cache and local documents
-backend/hf_cache/
-backend/icmr_nin/
-
 # Virtual environment
 venv/
 .env/

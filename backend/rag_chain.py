@@ -22,11 +22,11 @@ class ThresholdedHybridRetriever(Runnable):
         self.k = k
 
     def invoke(self, query: str, config=None) -> list[Document]:
-        # ✅ Embed dense and sparse representations
+        # Embed dense and sparse representations
         dense_vector = self.retriever.embeddings.embed_query(query)
         sparse_vector = self.retriever.sparse_encoder.encode_queries([query])[0]  # Not encode_documents!
 
-        # ✅ Perform hybrid search using Pinecone index
+        # Perform hybrid search using Pinecone index
         results = self.retriever.index.query(
             vector=dense_vector,
             sparse_vector=sparse_vector,
@@ -35,10 +35,10 @@ class ThresholdedHybridRetriever(Runnable):
             namespace=self.retriever.namespace,
         )
 
-        # ✅ Filter matches using similarity threshold
+        # Filter matches using similarity threshold
         filtered_matches = [match for match in results["matches"] if match["score"] >= self.threshold]
 
-        # ✅ Convert to LangChain Documents
+        # Convert to LangChain Documents
         return [
             Document(page_content=match["metadata"].get("text", ""), metadata=match["metadata"])
             for match in filtered_matches
@@ -102,8 +102,6 @@ def process_query(user_input: str, session_id: str):
         f"{msg.content}" if msg.type == "human" else f"{msg.content}"
         for msg in chat.messages
     ]
-    # source_docs = result.get("context", [])  # Retrieved documents
-    # print(source_docs)
     return result["answer"], readable_history
 
 def add_pdf_to_retriever(uploaded_file):
@@ -115,7 +113,6 @@ def add_pdf_to_retriever(uploaded_file):
     chunks = []
 
     try:
-        # Run OCR to ensure searchable text
         subprocess.run(
             ["ocrmypdf", "--force-ocr", str(temp_path), ocr_path],
             check=True,
@@ -123,7 +120,6 @@ def add_pdf_to_retriever(uploaded_file):
             stderr=subprocess.PIPE
         )
 
-        # Use pdfplumber to extract clean text
         raw_text = ""
         with pdfplumber.open(ocr_path) as pdf:
             for page in pdf.pages:
@@ -132,7 +128,7 @@ def add_pdf_to_retriever(uploaded_file):
                     raw_text += text + "\n\n"
 
         if not raw_text.strip():
-            print(f"⚠️ Empty text after OCR: {temp_path.name}")
+            print(f"Empty text after OCR: {temp_path.name}")
             return False
 
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
@@ -142,9 +138,9 @@ def add_pdf_to_retriever(uploaded_file):
         )
 
     except subprocess.CalledProcessError as e:
-        print(f"❌ OCR failed for {file_name}: {e.stderr.decode()}")
+        print(f"OCR failed for {file_name}: {e.stderr.decode()}")
     except Exception as e:
-        print(f"❌ Error processing {file_name}: {e}")
+        print(f"Error processing {file_name}: {e}")
     finally:
         temp_path.unlink(missing_ok=True)
         if os.path.exists(ocr_path):
@@ -154,5 +150,5 @@ def add_pdf_to_retriever(uploaded_file):
     metadatas = [doc.metadata for doc in chunks]
     for meta in metadatas:
         meta["source_institute"] = "User-Uploaded Document"
-    retriever.add_texts(texts, metadatas=metadatas)
+    pc_retriever.add_texts(texts, metadatas=metadatas)
     return True
