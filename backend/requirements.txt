@@ -5,6 +5,7 @@ langchain_core
 langchain_huggingface
 langchain_groq
 langchain_text_splitters
+python-multipart
 pathlib
 sentence_transformers
 fastapi
