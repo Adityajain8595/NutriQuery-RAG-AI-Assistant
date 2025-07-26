@@ -140,9 +140,9 @@ Navigate to http://localhost:5000 (or any host) in your browser.
 
 ## 🧪 API Endpoints
 
-1. /	       GET	     App's health check
-2. /ask	       POST	     Ask a question (query, session_id)
-3. /upload	   POST	     Upload PDF file (file)
+1. / (GET) - Checks backend running or not
+2. /ask (POST) - Ask a question (query, session_id)
+3. /upload (POST) - Upload PDF file (file)
 
 ---
 
@@ -158,7 +158,7 @@ Navigate to http://localhost:5000 (or any host) in your browser.
 
 (Still, there is much work to done! Looking to make NutriQuery more intelligent with addition of WHO and ICMR guidelines and reports.)
 
-***NOTE:** This application is made with the aim of assisting people with their general queries about nutrition and maintaing proper health. For emergency and medical help, please consult a healthcare expert for personalized guidance.
+**NOTE:** This application is made with the aim of assisting people with their general queries about nutrition and maintaing proper health. For emergency and medical help, please consult a healthcare expert for personalized guidance.
 
 ---
 
